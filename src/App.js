@@ -22,6 +22,8 @@ export default function App() {
   function handleCloseDetails() {
     setSelectedId(null);
   }
+  const average = (arr) =>
+    arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
   useEffect(
     function () {
@@ -80,7 +82,13 @@ export default function App() {
               onCloseDetails={handleCloseDetails}
             />
           ) : (
-            <PlayedGameList played={played} />
+            <>
+              <Stats played={played} average={average} />
+              <PlayedGameList
+                played={played}
+                onShowDetails={handleShowDetails}
+              />
+            </>
           )}
         </Box>
       </Main>
@@ -227,7 +235,7 @@ function Details({ selectedId, onAddGame, played, onCloseDetails }) {
               <p>
                 Genres:{" "}
                 {game.genres?.map((genre, i) => (
-                  <span>
+                  <span key={genre.id}>
                     {genre.name}
                     {i < game.genres.length - 1 && ", "}
                   </span>
@@ -238,7 +246,7 @@ function Details({ selectedId, onAddGame, played, onCloseDetails }) {
                 <p>
                   Published by:{" "}
                   {game.publishers?.map((publisher, i) => (
-                    <span>
+                    <span key={publisher.id}>
                       {publisher.name}
                       {i < game.publishers.length - 1 && ", "}
                     </span>
@@ -286,16 +294,59 @@ function Details({ selectedId, onAddGame, played, onCloseDetails }) {
   );
 }
 
-function PlayedGameList({ played }) {
+function Stats({ played, average }) {
+  const avgRating = average(played.map((game) => game.rating));
+  const avgUserRating = average(played.map((game) => game.userRating));
+
   return (
-    <ul>
+    <div className="stats">
+      <h2>Games you have played</h2>
+      <p>
+        <span>🔢 {played.length} games</span>
+        <span>RAWG: ⭐ {avgRating}</span>
+        <span>your average: 🌟 {avgUserRating}</span>
+      </p>
+    </div>
+  );
+}
+
+function PlayedGameList({ played, onShowDetails }) {
+  return (
+    <ul className="list list-played">
       {played.map((game) => (
-        <PlayedGame key={game.id} name={game.name} />
+        <PlayedGame
+          key={game.id}
+          id={game.id}
+          name={game.name}
+          image={game.background_image}
+          rating={game.rating}
+          userRating={game.userRating}
+          onShowDetails={onShowDetails}
+        />
       ))}
     </ul>
   );
 }
 
-function PlayedGame({ name }) {
-  return <li>{name}</li>;
+function PlayedGame({
+  id,
+  name,
+  image,
+  rating,
+  userRating,
+
+  onShowDetails,
+}) {
+  return (
+    <li className="game-item" onClick={() => onShowDetails(id)}>
+      <img src={image} alt={name} />
+      <div>
+        <h3>{name}</h3>
+        <p>
+          <span>RAWG: ⭐ {rating} </span>
+          <span>Your rating: 🌟 {userRating} </span>
+        </p>
+      </div>
+    </li>
+  );
 }

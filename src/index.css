@@ -121,11 +121,7 @@ body {
   width: 480px;
   max-width: 480px;
 }
-.list-games li:hover {
-  background-color: #eeeeee;
-  color: #393e46;
-  cursor: pointer;
-}
+
 /* 
 .list {
   width: 33%;
@@ -135,9 +131,6 @@ body {
 .list-games {
   list-style-type: none;
   padding: 0;
-}
-
-.list-games ul {
   margin-top: 0;
 }
 
@@ -149,10 +142,16 @@ body {
   border-radius: 0.5rem;
   padding: 1rem;
 }
+.list-games li:hover {
+  background-color: #eeeeee;
+  color: #393e46;
+  cursor: pointer;
+}
 
 .list-games li img {
-  width: 100px; /* Adjust as needed */
+  width: 33%;
   margin-right: 1rem;
+  border-radius: 0.5rem;
 }
 
 .list-games li h3 {
@@ -237,4 +236,73 @@ body {
 .description {
   padding: 25px;
   line-height: 20px;
+}
+
+.list-played {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.game-item {
+  display: flex;
+  align-items: center;
+  background-color: #393e46;
+  color: #eeeeee;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+.game-item:hover {
+  background-color: #eeeeee;
+  color: #393e46;
+  cursor: pointer;
+}
+
+.game-item img {
+  width: 33%;
+  height: auto;
+  margin-right: 1rem;
+  border-radius: 0.5rem;
+}
+
+.game-item div {
+  width: 100%;
+}
+
+.game-item h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.game-item p {
+  margin: 0.5rem 0;
+  display: flex;
+  justify-content: space-around;
+}
+
+.game-item a {
+  color: #00adb5;
+  text-decoration: none;
+}
+
+.game-item a:hover {
+  text-decoration: underline;
+}
+
+.stats {
+  background-color: #5c616aa5;
+  color: #eeeeee;
+  border-radius: 0.5rem;
+  padding: 1.55rem;
+  margin-bottom: 1rem;
+}
+
+.stats h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.stats p span {
+  margin-right: 1rem;
 }
