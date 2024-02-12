@@ -6,11 +6,21 @@ export default function App() {
   // const KEY = "e529db99b8f0a8921b88a2e46df456a53a75edad";
   const [query, setQuery] = useState("");
   const [games, setGames] = useState([]);
+  const [played, setPlayed] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   function handleShowDetails(id) {
     setSelectedId(selectedId !== id ? id : null);
+  }
+
+  function handleAddPlayedGame(playedGame) {
+    setPlayed([...played, playedGame]);
+    console.log(playedGame);
+  }
+
+  function handleCloseDetails() {
+    setSelectedId(null);
   }
 
   useEffect(
@@ -61,7 +71,18 @@ export default function App() {
             <GamesList games={games} onShowDetails={handleShowDetails} />
           )}
         </Box>
-        <Box>{selectedId && <Details selectedId={selectedId} />}</Box>
+        <Box>
+          {selectedId ? (
+            <Details
+              selectedId={selectedId}
+              onAddGame={handleAddPlayedGame}
+              played={played}
+              onCloseDetails={handleCloseDetails}
+            />
+          ) : (
+            <PlayedGameList played={played} />
+          )}
+        </Box>
       </Main>
     </div>
   );
@@ -143,9 +164,28 @@ function Game({ game, onShowDetails }) {
   );
 }
 
-function Details({ selectedId }) {
+function Details({ selectedId, onAddGame, played, onCloseDetails }) {
   const [game, setGame] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [userRating, setUserRating] = useState(null);
+  const isPlayed = played.map((game) => game.id).includes(selectedId);
+  const playedGameRating = played.find(
+    (game) => game.id === selectedId
+  )?.userRating;
+
+  function handleAdd() {
+    const newPlayedGame = {
+      id: selectedId,
+      background_image: game.background_image,
+      slug: game.slug,
+      name: game.name,
+      rating: Number(game.rating),
+      userRating,
+    };
+    onAddGame(newPlayedGame);
+    onCloseDetails();
+  }
+
   useEffect(
     function () {
       async function fetchMovieDetails() {
@@ -169,17 +209,32 @@ function Details({ selectedId }) {
       ) : (
         <>
           <header>
+            <button className="btn-back" onClick={onCloseDetails}>
+              &larr;
+            </button>
             <img src={game.background_image} alt={game.slug} />
             <div className="details-overview">
               <h3>{game.name}</h3>
-              <p>{new Date(game.released).toDateString()}</p>
+              {game.released && <p>{new Date(game.released).toDateString()}</p>}
+
               <p>
                 Platforms:{" "}
                 {game.platforms?.map((platform, i) => (
                   <span key={i}>{platform.platform.name} </span>
                 ))}
               </p>
-              {game.publishers?.length > 0 ? (
+
+              <p>
+                Genres:{" "}
+                {game.genres?.map((genre, i) => (
+                  <span>
+                    {genre.name}
+                    {i < game.genres.length - 1 && ", "}
+                  </span>
+                ))}
+              </p>
+
+              {game.publishers?.length > 0 && (
                 <p>
                   Published by:{" "}
                   {game.publishers?.map((publisher, i) => (
@@ -189,18 +244,58 @@ function Details({ selectedId }) {
                     </span>
                   ))}
                 </p>
-              ) : (
-                ""
               )}
+              {game.rating ? <p>⭐ {game.rating} RAWG rating</p> : ""}
             </div>
           </header>
-          <StarRating />
-          <div
-            className="description"
-            dangerouslySetInnerHTML={{ __html: game.description }}
-          />
+          <section>
+            <div className="user-rating">
+              {!isPlayed ? (
+                <>
+                  <StarRating
+                    className="star-rating"
+                    size={28}
+                    color="#01ADB5"
+                    messages={[
+                      "skip",
+                      "meh",
+                      "good",
+                      "recommended",
+                      "exeptional",
+                    ]}
+                    onSetRating={setUserRating}
+                  />
+                  {userRating && (
+                    <button className="btn-add" onClick={handleAdd}>
+                      Add Game
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>You have rated this game: {playedGameRating} ⭐</p>
+              )}
+            </div>
+            <div
+              className="description"
+              dangerouslySetInnerHTML={{ __html: game.description }}
+            />
+          </section>
         </>
       )}
     </div>
   );
+}
+
+function PlayedGameList({ played }) {
+  return (
+    <ul>
+      {played.map((game) => (
+        <PlayedGame key={game.id} name={game.name} />
+      ))}
+    </ul>
+  );
+}
+
+function PlayedGame({ name }) {
+  return <li>{name}</li>;
 }

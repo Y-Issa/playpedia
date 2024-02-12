@@ -60,6 +60,7 @@ export default function StarRating({
         ))}
       </div>
       <p style={textStyle}>
+        {(tempRating || rating) === 0 ? "Rate This Game" : ""}
         {messages.length === maxRating
           ? messages[tempRating ? tempRating - 1 : rating - 1]
           : tempRating || rating || ""}
